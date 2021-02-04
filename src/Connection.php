@@ -277,6 +277,13 @@ class Connection extends Component
      */
     public $unixSocket;
     /**
+     * @var string the username for establishing DB connection. Defaults to `null` meaning AUTH command will be performed without username.
+     * Username was introduced in redis 6.
+     * See https://redis.io/commands/auth
+     * @since 2.0.15
+     */
+    public $username;
+    /**
      * @var string the password for establishing DB connection. Defaults to null meaning no AUTH command is sent.
      * See https://redis.io/commands/auth
      */
@@ -631,7 +638,7 @@ class Connection extends Component
                 stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
             }
             if ($this->password !== null) {
-                $this->executeCommand('AUTH', [$this->password]);
+                $this->executeCommand('AUTH', array_filter([$this->username, $this->password]));
             }
             if ($this->database !== null) {
                 $this->executeCommand('SELECT', [$this->database]);
